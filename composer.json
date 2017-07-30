@@ -1,5 +1,5 @@
 {
-    "name": "DBConnector",
+    "name": "php-dao",
     "description": "Abstraction of the DAO pattern using PDO.",
     "authors": [
         {
@@ -10,7 +10,7 @@
     "autoload": {
         "psr-4":
         {
-            "DBConnector\\":
+            "PhpDao\\":
             [
                 "src/",
                 "tests/"

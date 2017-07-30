@@ -2,7 +2,7 @@
 
 require 'vendor/autoload.php';
 
-class testDb extends \DBConnector\DatabaseConnection
+class testDb extends \PhpDao\DatabaseConnection
 {
   public function host()
   {
@@ -30,7 +30,7 @@ class testDb extends \DBConnector\DatabaseConnection
   }
 }
 
-class DAOConcreteClass extends \DBConnector\DataAccessObject
+class DAOConcreteClass extends \PhpDao\DataAccessObject
 {
   public function table()
   {
@@ -42,5 +42,5 @@ $test = new DAOConcreteClass(new testDb());
 
 //$test->create(['token' => '123']);
 
-print_r($test->update(['token' => '123456'], 3));
-print_r($test->get(3));
+//print_r($test->update(['token' => '123456'], 3));
+print_r($test->all());

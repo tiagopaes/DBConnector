@@ -1,6 +1,6 @@
 <?php
 
-namespace DBConnector;
+namespace PhpDao;
 
 use PHPUnit\Framework\TestCase;
 
