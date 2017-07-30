@@ -1,0 +1,24 @@
+{
+    "name": "DBConnector",
+    "description": "Abstraction of the DAO pattern using PDO.",
+    "authors": [
+        {
+            "name": "Tiago Paes",
+            "email": "tiagopaes37@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4":
+        {
+            "DBConnector\\":
+            [
+                "src/",
+                "tests/"
+            ]
+        }
+    },
+    "require-dev": {
+        "php": ">=5.4",
+        "phpunit/phpunit": ">= 4.8"
+    }
+}
