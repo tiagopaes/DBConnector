@@ -1,5 +1,5 @@
 {
-    "name": "tiagopaes/db-connector",
+    "name": "tiagopaes/db-connector-lib",
     "description": "Abstraction of the DAO pattern using PDO.",
     "authors": [
         {
