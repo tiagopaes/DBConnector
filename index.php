@@ -40,6 +40,7 @@ class DAOConcreteClass extends \DBConnector\DataAccessObject
 
 $test = new DAOConcreteClass(new testDb());
 
-$test->create(['token' => '123']);
+//$test->create(['token' => '123']);
 
+print_r($test->update(['token' => '123456'], 3));
 print_r($test->get(3));
