@@ -2,7 +2,7 @@
 
 namespace PhpDao;
 
-class DAOConcreteClass extends DataAccessObject
+class DAOConcreteClass extends QueryBuilder
 {
   public function table()
   {

@@ -2,11 +2,14 @@
 
 namespace PhpDao;
 
-abstract class DataAccessObject
+use Exception;
+use PDO;
+
+abstract class QueryBuilder
 {
     protected $database;
 
-    public function __construct(DatabaseConnection $connection = null)
+    public function __construct(Connection $connection = null)
     {
       $this->database = $connection ? $connection->getConnection() : null;
     }
@@ -74,7 +77,7 @@ abstract class DataAccessObject
         $sql = $this->database->prepare($query);
         $sql->execute($customArray);
         $this->database->commit();
-      } catch (\Exception $error) {
+      } catch (Exception $error) {
           $this->database->rollback();
           return $error->getMessage();
         }
@@ -90,9 +93,9 @@ abstract class DataAccessObject
            $sql = $this->database->prepare($query);
            $sql->execute();
            $this->database->commit();
-           $data = $sql->fetchAll(\PDO::FETCH_ASSOC);
+           $data = $sql->fetchAll(PDO::FETCH_ASSOC);
            return $data;
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             $this->database->rollback();
             return $error->getMessage();
         }
@@ -109,9 +112,9 @@ abstract class DataAccessObject
            $sql = $this->database->prepare($query);
            $sql->execute([':id' => $id]);
            $this->database->commit();
-           $data = $sql->fetchAll(\PDO::FETCH_ASSOC);
+           $data = $sql->fetchAll(PDO::FETCH_ASSOC);
            return $data[0];
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             $this->database->rollback();
             return $error->getMessage();
         }
@@ -134,7 +137,7 @@ abstract class DataAccessObject
            $sql->execute(array_merge($customArray, [':id' => $id]));
            $this->database->commit();
            return true;
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             $this->database->rollback();
             return $error->getMessage();
         }
@@ -151,7 +154,7 @@ abstract class DataAccessObject
            $sql->execute([':id' => $id]);
            $this->database->commit();
            return true;
-        } catch (\Exception $error) {
+        } catch (Exception $error) {
             $this->database->rollback();
             return $error->getMessage();
         }

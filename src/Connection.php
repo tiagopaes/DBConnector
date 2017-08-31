@@ -2,7 +2,10 @@
 
 namespace PhpDao;
 
-abstract class DatabaseConnection
+use PDOException;
+use PDO;
+
+abstract class Connection
 {
     protected $database;
     protected $host;
@@ -20,10 +23,10 @@ abstract class DatabaseConnection
         $pass = $this->password();
 
         try {
-          $this->database = new \PDO("$driver:host=$host; dbname=$name", $user, $pass);
-          $this->database->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+          $this->database = new PDO("$driver:host=$host; dbname=$name", $user, $pass);
+          $this->database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
           $this->database->exec('SET NAMES utf8');
-        } catch (\PDOException $error) {
+        } catch (PDOException $error) {
             die("Connection Error: " . $error->getMessage());
           }
 

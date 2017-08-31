@@ -2,7 +2,7 @@
 
 namespace PhpDao;
 
-class DatabaseConnectionConcretClass extends DatabaseConnection
+class ConnectionConcretClass extends Connection
 {
   public function host()
   {
