@@ -4,7 +4,7 @@ namespace PhpDao;
 
 /**
  * Class QueryBuilder
- * @package PhpDao
+ * @package Hero
  * @method QueryBuilder table (string $table)
  * @method QueryBuilder join (string $join)
  * @method QueryBuilder fields (array $fields)
@@ -15,20 +15,16 @@ namespace PhpDao;
  * @method QueryBuilder limit (array $join)
  */
 
-class QueryBuilder
+class NewQueryBuilder
 {
+
+    private $connection;
+
     /**
      * @var array
      */
-    private $clausules = [];
-    /**
-     * QueryBuilder constructor.
-     */
-    public function __construct()
-    {
-        // configure
-    }
 
+    private $clausules = [];
     /**
      * @param $name
      * @param $arguments
@@ -43,7 +39,14 @@ class QueryBuilder
         $this->clausules[strtolower($name)] = $clausule;
         return $this;
     }
-
+    /**
+     * QueryBuilder constructor.
+     * @param array $options
+     */
+    public function __construct($connection)
+    {
+        $this->connection = $connection;
+    }
     /**
      * @param array $values
      * @return string
@@ -71,9 +74,8 @@ class QueryBuilder
         // INSERT INTO {table} ({fields}) VALUES ({values});
         // junta o comando
         $sql = implode(' ', $command);
-        return $this->executeInsert($sql, $values);
+        return $this->connection->executeInsert($sql, $values);
     }
-
     /**
      * @param $values
      * @return string
@@ -130,9 +132,8 @@ class QueryBuilder
         // SELECT {fields} FROM <JOIN> {table} <WHERE> <GROUP> <ORDER> <HAVING> <LIMIT>;
         // junta o comando
         $sql = implode(' ', $command);
-        return $this->executeSelect($sql, $values);
+        return $this->connection->executeSelect($sql, $values);
     }
-
     /**
      * @param $values
      * @param $filters
@@ -179,9 +180,8 @@ class QueryBuilder
         // UPDATE {table} SET {set} <WHERE>
         // junta o comando
         $sql = implode(' ', $command);
-        return $this->executeUpdate($sql, array_merge($values, $filters));
+        return $this->connection->executeUpdate($sql, array_merge($values, $filters));
     }
-
     /**
      * @param $filters
      * @return int
@@ -216,46 +216,6 @@ class QueryBuilder
         // DELETE FROM {table} <JOIN> <USING> <WHERE>
         // junta o comando
         $sql = implode(' ', $command);
-        return $this->executeUpdate($sql, $filters);
-    }
-
-    /**
-     * @param $sql
-     * @param $values
-     * @return string
-     */
-    private function executeInsert($sql, $values)
-    {
-        return '';
-    }
-    
-    /**
-     * @param $sql
-     * @param $values
-     * @return array
-     */
-    private function executeSelect($sql, $values)
-    {
-        return [];
-    }
-    
-    /**
-     * @param $sql
-     * @param $values
-     * @return int
-     */
-    private function executeUpdate($sql, $values)
-    {
-        return 0;
-    }
-    
-    /**
-     * @param $sql
-     * @param $values
-     * @return int
-     */
-    private function executeDelete($sql, $values)
-    {
-        return 0;
+        return $this->connection->executeDelete($sql, $filters);
     }
 }
