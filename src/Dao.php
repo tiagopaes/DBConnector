@@ -88,5 +88,10 @@ abstract class Dao
 			->fields($fields)
 			->where(['id = ?'])
 			->delete([$id]);
-    }
+	}
+	
+	public function query()
+	{
+		return $this->queryBuilder->table($this->table());
+	}
 }
