@@ -2,161 +2,179 @@
 
 namespace PhpDao;
 
-use Exception;
-use PDO;
-
-abstract class QueryBuilder
+class QueryBuilder
 {
-    protected $database;
+    private $connection;
 
-    public function __construct(Connection $connection = null)
+    private $clausules = [];
+    
+    function __call($name, $arguments)
     {
-      $this->database = $connection ? $connection->getConnection() : null;
-    }
-
-    abstract function table();
-
-    public function getColumns(array $data)
-    {
-      $columns = '';
-      foreach ($data as $key => $value) {
-        $columns .= $key . ', ';
-      }
-      return substr($columns, 0, -2);
-    }
-
-    public function getCustomColumns(array $data)
-    {
-      $customColumns = '';
-      foreach ($data as $key => $value) {
-        $customColumns .= ':' . $key . ', ';
-      }
-      return substr($customColumns, 0, -2);
-    }
-
-    public function getCustomArray(array $data)
-    {
-      $customColumns = $this->getCustomColumns($data);
-      $keys = explode(", ", $customColumns);
-      $customArray = array_fill_keys($keys, '');
-      $result = [];
-
-      foreach ($data as $key => $value) {
-        foreach ($customArray as $keyVal => $val) {
-          if ($key == substr($keyVal, 1)) {
-            $result[$keyVal] = $value;
-            break;
-          }
+        $clausule = $arguments[0];
+        if (count($arguments) > 1) {
+            $clausule = $arguments;
         }
-      }
-
-      return $result;
+        $this->clausules[strtolower($name)] = $clausule;
+        return $this;
     }
 
-    public function getUpdateSetString(array $data)
+    public function __construct(Connection $connection)
     {
-      $string = '';
-      foreach ($data as $key => $value) {
-        $string .= '' . $key . ' =:' . $key . ', ';
-      }
-      return substr($string, 0, -2);
+        $this->connection = $connection;
     }
 
-    public function create(array $data)
+    public function insert($values)
     {
-      $columns = $this->getColumns($data);
-      $customColumns = $this->getCustomColumns($data);
-      $customArray = $this->getCustomArray($data);
-      $table = $this->table();
-      $query = 'INSERT INTO ' . $table .
-            ' (' . $columns . ') VALUES (' . $customColumns . ');';
+        $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
+        $_fields = isset($this->clausules['fields']) ? $this->clausules['fields'] : '<fields>';
+        $fields = implode(', ', $_fields);
+        $_placeholders = array_map(function() {
+            return '?';
+        }, $_fields);
+        $placeholders = implode(', ', $_placeholders);
+        
+        $command = [];
+        $command[] = 'INSERT INTO';
+        $command[] = $table;
+        $command[] = '(' . $fields . ')';
+        $command[] = 'VALUES';
+        $command[] = '(' . $placeholders . ')';
+        
+        $sql = implode(' ', $command);
+        
+        return $this->connection->executeInsert($sql, $values);
+    }
 
-      $this->database->beginTransaction();
-
-      try {
-        $sql = $this->database->prepare($query);
-        $sql->execute($customArray);
-        $this->database->commit();
-      } catch (Exception $error) {
-          $this->database->rollback();
-          return $error->getMessage();
+    public function select($values = [])
+    {
+        $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
+        
+        $_fields = isset($this->clausules['fields']) ? $this->clausules['fields'] : '*';
+        $fields = implode(', ', $_fields);
+        $join = isset($this->clausules['join']) ? $this->clausules['join'] : '';
+        
+        $command = [];
+        $command[] = 'SELECT';
+        $command[] = $fields;
+        $command[] = 'FROM';
+        $command[] = $table;
+        
+        if ($join) {
+            $command[] = $join;
         }
+        
+        $clausules = [
+            'where' => [
+                'instruction' => 'WHERE',
+                'separator' => ' ',
+            ],
+            'group' => [
+                'instruction' => 'GROUP BY',
+                'separator' => ', ',
+            ],
+            'order' => [
+                'instruction' => 'ORDER BY',
+                'separator' => ', ',
+            ],
+            'having' => [
+                'instruction' => 'HAVING',
+                'separator' => ' AND ',
+            ],
+            'limit' => [
+                'instruction' => 'LIMIT',
+                'separator' => ',',
+            ],
+        ];
+        foreach($clausules as $key => $clausule) {
+            if (isset($this->clausules[$key])) {
+                $value = $this->clausules[$key];
+                if (is_array($value)) {
+                    $value = implode($clausule['separator'], $this->clausules[$key]);
+                }
+                $command[] = $clausule['instruction'] . ' ' . $value;
+            }
+        }
+        
+        $sql = implode(' ', $command);
+        
+        return $this->connection->executeSelect($sql, $values);
     }
 
-    public function all()
+    public function update($values, $filters = [])
     {
-        $query = 'SELECT * FROM ' . $this->table() . ';';
-
-        $this->database->beginTransaction();
-
-        try {
-           $sql = $this->database->prepare($query);
-           $sql->execute();
-           $this->database->commit();
-           $data = $sql->fetchAll(PDO::FETCH_ASSOC);
-           return $data;
-        } catch (Exception $error) {
-            $this->database->rollback();
-            return $error->getMessage();
+        $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
+        $join = isset($this->clausules['join']) ? $this->clausules['join'] : '';
+     
+        $_fields = isset($this->clausules['fields']) ? $this->clausules['fields'] : '<fields>';
+        $sets = $_fields;
+     
+        if (is_array($_fields)) {
+            $sets = implode(', ', array_map(function($value) {
+                return $value . ' = ?';
+            }, $_fields));
         }
+     
+        $command = [];
+        $command[] = 'UPDATE';
+        $command[] = $table;
+        if ($join) {
+            $command[] = $join;
+        }
+        $command[] = 'SET';
+        $command[] = $sets;
+     
+        $clausules = [
+            'where' => [
+                'instruction' => 'WHERE',
+                'separator' => ' ',
+            ]
+        ];
+     
+        foreach($clausules as $key => $clausule) {
+            if (isset($this->clausules[$key])) {
+                $value = $this->clausules[$key];
+                if (is_array($value)) {
+                    $value = implode($clausule['separator'], $this->clausules[$key]);
+                }
+                $command[] = $clausule['instruction'] . ' ' . $value;
+            }
+        }
+     
+        $sql = implode(' ', $command);
+     
+        return $this->connection->executeUpdate($sql, array_merge($values, $filters));
     }
 
-    public function get($id)
+    public function delete($filters)
     {
-        $query = 'SELECT * FROM ' . $this->table() .
-              ' WHERE id = :id;';
-
-        $this->database->beginTransaction();
-
-        try {
-           $sql = $this->database->prepare($query);
-           $sql->execute([':id' => $id]);
-           $this->database->commit();
-           $data = $sql->fetchAll(PDO::FETCH_ASSOC);
-           return $data[0];
-        } catch (Exception $error) {
-            $this->database->rollback();
-            return $error->getMessage();
+        $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
+        $join = isset($this->clausules['join']) ? $this->clausules['join'] : '';
+        
+        $command = [];
+        $command[] = 'DELETE FROM';
+        $command[] = $table;
+        if ($join) {
+            $command[] = $join;
         }
-    }
-
-    public function update(array $data, $id)
-    {
-        $columns = $this->getColumns($data);
-        $customColumns = $this->getCustomColumns($data);
-        $customArray = $this->getCustomArray($data);
-        $table = $this->table();
-        $setString = $this->getUpdateSetString($data);
-        $query = 'UPDATE ' . $table . ' SET ' .
-              $setString . ' WHERE id = :id;';
-
-        $this->database->beginTransaction();
-
-        try {
-           $sql = $this->database->prepare($query);
-           $sql->execute(array_merge($customArray, [':id' => $id]));
-           $this->database->commit();
-           return true;
-        } catch (Exception $error) {
-            $this->database->rollback();
-            return $error->getMessage();
+        $clausules = [
+            'where' => [
+                'instruction' => 'WHERE',
+                'separator' => ' ',
+            ]
+        ];
+        
+        foreach($clausules as $key => $clausule) {
+            if (isset($this->clausules[$key])) {
+                $value = $this->clausules[$key];
+                if (is_array($value)) {
+                    $value = implode($clausule['separator'], $this->clausules[$key]);
+                }
+                $command[] = $clausule['instruction'] . ' ' . $value;
+            }
         }
-    }
-
-    public function delete($id)
-    {
-        $query = 'DELETE FROM ' . $this->table() . ' WHERE id = :id;';
-
-        $this->database->beginTransaction();
-
-        try {
-           $sql = $this->database->prepare($query);
-           $sql->execute([':id' => $id]);
-           $this->database->commit();
-           return true;
-        } catch (Exception $error) {
-            $this->database->rollback();
-            return $error->getMessage();
-        }
+        
+        $sql = implode(' ', $command);
+        
+        return $this->connection->executeDelete($sql, $filters);
     }
 }

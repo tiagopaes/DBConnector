@@ -2,44 +2,88 @@
 
 namespace PhpDao;
 
-use PDOException;
 use PDO;
+use PDOStatement;
+use Exception;
 
-abstract class Connection
+class Connection
 {
-    protected $database;
-    protected $host;
-    protected $name;
-    protected $user;
-    protected $password;
-    protected $driver;
+    private $pdo = null;
 
-    public function getConnection()
+    private $options = [];
+    
+    public function __construct(array $options)
     {
-        $driver = $this->driver();
-        $host = $this->host();
-        $name = $this->name();
-        $user = $this->user();
-        $pass = $this->password();
-
-        try {
-          $this->database = new PDO("$driver:host=$host; dbname=$name", $user, $pass);
-          $this->database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-          $this->database->exec('SET NAMES utf8');
-        } catch (PDOException $error) {
-            die("Connection Error: " . $error->getMessage());
-          }
-
-        return $this->database;
+        $this->options = $options;
     }
 
-    abstract function host();
+    public function connect()
+    {
+        if (!$this->pdo) {
+            $this->pdo = new PDO(
+                $this->dsn(),
+                $this->options['user'],
+                $this->options['password']
+            );
+        }
 
-    abstract function name();
+        return $this->pdo;
+    }
 
-    abstract function user();
+    public function dsn()
+    {
+        $host = "host={$this->options['host']}";
+        $port = "port={$this->options['port']}";
+        $dbname = "dbname={$this->options['database']}";
+        $driver = $this->options['driver'];
+        
+        return "$driver:{$host};{$port};{$dbname}";
+    }
 
-    abstract function password();
+    public final function statement($sql)
+    {
+        return $this->connect()->prepare($sql);
+    }
 
-    abstract function driver();
+    public final function executeInsert($sql, array $values)
+    {
+        $statement = $this->statement($sql);
+        if ($statement && $statement->execute(array_values($values))) {
+            return $this->connect()->lastInsertId();
+        }
+        return null;
+    }
+
+    public final function executeSelect($sql, array $values)
+    {
+        $statement = $this->statement($sql);
+        if ($statement && $statement->execute(array_values($values))) {
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+        }
+        return null;
+    }
+
+    public final function executeUpdate($sql, array $values)
+    {
+        return $this->execute($sql, $values);
+    }
+
+    public final function executeDelete($sql, array $values)
+    {
+        return $this->execute($sql, $values);
+    }
+
+    public final function execute($sql, array $values)
+    {
+        $statement = $this->statement($sql);
+        if ($statement && $statement->execute(array_values($values))) {
+            return $statement->rowCount();
+        }
+        return null;
+    }
+    
+    public function getOptions()
+    {
+        return $this->options;
+    }
 }
