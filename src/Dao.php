@@ -90,7 +90,7 @@ abstract class Dao
 			->delete([$id]);
 	}
 	
-	public function query()
+	public function execute()
 	{
 		return $this->queryBuilder->table($this->table());
 	}
