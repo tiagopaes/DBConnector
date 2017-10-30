@@ -16,7 +16,7 @@ composer require tiagopaes/php-dao
 
 ## How to use
 
-Example files coming soon.
+Example files on examples folder.
 
 ## Versioning
 
