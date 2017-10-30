@@ -7,8 +7,8 @@ use PhpDao\QueryBuilder;
 
 $options = [
     'host' => 'localhost',
-    'database' => 'qa_tools',
-    'user' => 'tiago',
+    'database' => 'your_database_name',
+    'user' => 'root',
     'password' => '',
     'port' => '3306',
     'driver' => 'mysql'
