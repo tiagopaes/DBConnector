@@ -13,36 +13,21 @@ use Exception;
 class Connection
 {
     /**
+     * The PDO Object.
      * @var PDO
      */
     private $pdo = null;
 
     /**
-     * Database config data options.
-     * @var array
-     */
-    private $options = [];
-
-    /**
      * Connection constructor.
      * 
-     * @param array $options
+     * @param PDO $pdo The PDO object
      * 
      * @throws Exception
      */
-    public function __construct(array $options)
+    public function __construct(PDO $pdo)
     {
-        $this->options = $options;
-    }
-
-    /**
-     * Returns the Database config data options.
-     * 
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->options;
+        $this->pdo = $pdo;
     }
 
     /**
@@ -52,30 +37,7 @@ class Connection
      */
     public function connect()
     {
-        if (!$this->pdo) {
-            $this->pdo = new PDO(
-                $this->dsn(),
-                $this->options['user'],
-                $this->options['password']
-            );
-        }
-
         return $this->pdo;
-    }
-
-    /**
-     * Returns the PDO dsn string.
-     * 
-     * @return string
-     */
-    public function dsn()
-    {
-        $host = "host={$this->options['host']}";
-        $port = "port={$this->options['port']}";
-        $dbname = "dbname={$this->options['database']}";
-        $driver = $this->options['driver'];
-        
-        return "$driver:{$host};{$port};{$dbname}";
     }
 
     /**
