@@ -122,7 +122,7 @@ class Model extends QueryBuilder
 	{
 		return $this->table($this->getTable())
 		   ->where(['id = ?'])
-		   ->select([$id]);
+		   ->select([$id])[0];
 	}
 
 	/**

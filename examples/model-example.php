@@ -1,16 +1,14 @@
 <?php
-require __DIR__ . '/../../vendor/autoload.php';
-//require '../../vendor/autoload.php';
-//require './class/BaseDao.php';
-require './class/UserDao.php';
+
+require __DIR__ . '/../vendor/autoload.php';
 
 use PhpDao\Connection;
-use PhpDao\Dao;
+use PhpDao\Model;
 
 $options = [
     'host' => 'localhost',
-    'database' => 'ranking',
-    'user' => 'tiago',
+    'database' => 'your-database-name',
+    'user' => 'username',
     'password' => '',
     'port' => '3306',
     'driver' => 'mysql'
@@ -28,25 +26,44 @@ $pdo->setAttribute(
 
 //Instance the Connection class and pass the PDO object on constructor
 $connection = new Connection($pdo);
-Dao::setConnection($connection);
 
+//Sets the connection to Model Object
+Model::setConnection($connection);
 
-// Instance the Dao class created
-$userDao = new UserDao();
+class User extends Model
+{
+    protected $table = 'users';
+}
 
-// insert example 
-//$result = $userDao->find(7);
-//$result->password = 'updated';
-// $result = $userDao->create([
-//     'token' => 'token maroto',
-//     'email' => 'live@live.com',
-//     'password' => 'updated 2'
-//     ]);
-// $id = $result->id;
-// print_r($result);
-// print_r('---------------------');
+// Instance the User class model created
+$user = new User();
 
-//$userDao->delete(7);
-// $result = $userDao->find($id);
-//$result = $userDao->find(7);
+//Creates a new user on database
+$userCreated = $user->create([
+    'token' => 'token maroto',
+    'email' => 'live@live.com',
+    'password' => 'updated 2'
+]);
 
+//Creates a new user on database other way
+$user = new User();
+$user->token = 'token';
+$user->email = 'email';
+$user->password = 'password';
+$user->save();
+
+// get all users recorded
+$users = $user->all();
+
+// get only one user
+$user = $user->find($id);
+
+//update a model
+$user->save([
+    'token' => 'updated',
+    'email' => 'updated',
+    'password' => 'updated'
+]);
+
+// Delete a model
+$user->remove($id);
