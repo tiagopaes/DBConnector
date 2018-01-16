@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/../../vendor/autoload.php';
 //require '../../vendor/autoload.php';
-require './class/BaseDao.php';
+//require './class/BaseDao.php';
 require './class/UserDao.php';
 
 use PhpDao\Connection;
@@ -35,27 +35,18 @@ Dao::setConnection($connection);
 $userDao = new UserDao();
 
 // insert example 
-$insertedId = $userDao->create([
-     'email' => 'email@test.com',
-     'password' => 'password',
-     'token' => 'token'
-]);
+//$result = $userDao->find(7);
+//$result->password = 'updated';
+// $result = $userDao->create([
+//     'token' => 'token maroto',
+//     'email' => 'live@live.com',
+//     'password' => 'updated 2'
+//     ]);
+// $id = $result->id;
+// print_r($result);
+// print_r('---------------------');
 
-print_r($insertedId);
-// select examples
+//$userDao->delete(7);
+// $result = $userDao->find($id);
+//$result = $userDao->find(7);
 
-//get all records
-// $users = $userDao->get();
-
-// //get only one record by id
-// $id = 1;
-// $user = $userDao->get($id);
-
-// //update example
-// $data = [
-//     'email' => 'newemail@test.com'
-// ];
-// $userDao->update($id, $data);
-
-// //delete by id example
-// $userDao->delete($id);

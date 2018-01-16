@@ -2,11 +2,29 @@
 
 namespace PhpDao;
 
+/**
+ * Query Builder class.
+ * @package PhpDao
+ */
 class QueryBuilder
 {
-    public static $connection;
+    /**
+     * The PDO Object.
+     * @var PDO
+     */
+    protected static $connection;
 
     private $clausules = [];
+
+    public static function setConnection(Connection $connection)
+    {
+        self::$connection = $connection;
+    }
+
+    public function getConnection()
+    {
+        return self::$connection;
+    }
     
     function __call($name, $arguments)
     {
@@ -18,21 +36,11 @@ class QueryBuilder
         return $this;
     }
 
-    public static function setConnection(Connection $connection)
-    {
-        self::$connection = $connection;
-    }
-
-    public function getConnection()
-    {
-        return self::$connection;
-    }
-
     public function select($values = [])
     {
         $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
         
-        $_fields = isset($this->clausules['fields']) ? $this->clausules['fields'] : '*';
+        $_fields = isset($this->clausules['fields']) ? $this->clausules['fields'] : ['*'];
         $fields = implode(', ', $_fields);
         $join = isset($this->clausules['join']) ? $this->clausules['join'] : '';
         
@@ -80,7 +88,7 @@ class QueryBuilder
         
         $sql = implode(' ', $command);
         
-        return $this->getConnection()->executeSelect($sql, $values);
+        return $this->getConnection()->executeSelect($sql, $values, $this->getClassName());
     }
 
     public function insert($values)
@@ -105,7 +113,7 @@ class QueryBuilder
         return $this->getConnection()->executeInsert($sql, $values);
     }
 
-    public function update($values, $filters = [])
+    public function update($values)
     {
         $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
         $join = isset($this->clausules['join']) ? $this->clausules['join'] : '';

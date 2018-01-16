@@ -2,88 +2,112 @@
 
 namespace PhpDao;
 
-class Dao
+class Dao extends QueryBuilder
 {
-    protected static $connection;
+	protected $table = '';
 
-    public function __construct()
-    {  
+	private $data = [];
+
+	public function __contruct(array $data = [])
+	{
+		$this->fill($data);
+	}
+
+	public function __get($name)
+    {
+		if (isset($this->data[$name])) {
+			return $this->data[$name];
+		}
+
+		return null;
 	}
 	
-	public static function setConnection(Connection $connection)
+    public function __set($name, $value)
     {
-        self::$connection = $connection;
+        $this->data[$name] = $value;
     }
-
-    public function getConnection()
-    {
-        return self::$connection;
-    }
-
-	protected $table;
 	
 	public function getTable()
 	{
 		return $this->table;
 	}
 
-	public function create(array $data)
+	protected function getClassName()
 	{
-		$fields = implode(array_keys($data), ',');
-		$values = [];
-
-		foreach ($data as $key => $item) {
-			$values[$key] = '?';
+        return get_class($this);
+	}
+	
+	public function fill(array $data)
+	{
+		foreach ($data as $key => $value) {
+			$this->data[$key] = $value;
 		}
-		$values2 = implode($values, ',');
-
-		$query = "INSERT INTO {$this->table} ({$fields}) VALUES ({$values2})";
-		return $this->getConnection()->executeInsert($query, $values);
 	}
 
-    public function get($id = null)
-    {
-		if (!$id) {
-			return $this->queryBuilder
-				->table($this->table())
-        		->fields(['*'])
+	private function getFields()
+	{
+		return array_keys($this->data);
+	}
+
+	public function all()
+	{
+		return $this->table($this->getTable())
 				->select();
-		}
-		
-		return $this->queryBuilder
-			->table($this->table())
-       		->fields(['*'])
-       		->where(['id = ?'])
-       		->select([$id])[0];
-    }
+	}
 
-    public function update($id, $data)
-    {
-		$fields = array_keys($data);
-		$values = [];
-		
-		foreach ($fields as $key => $item) {
-			$values[$key] = $data[$item];
+	public function find($id)
+	{
+		return $this->table($this->getTable())
+		   ->where(['id = ?'])
+		   ->select([$id]);
+	}
+
+	public function save(array $data = [])
+	{
+		$this->fill($data);
+
+		if (isset($this->data['id'])) {
+			$this->table($this->getTable())
+				->fields($this->getFields())
+				->where(['id = ?'])
+				->update($this->data, [$this->data['id']]);
+
+			return $this->table($this->getTable())
+				->fields(['*'])
+				->where(['id = ?'])
+				->select([$this->data['id']])[0];	
 		}
+
+		$id = $this->table($this->getTable())
+			->fields($this->getFields())
+			->insert($this->data);
 		
-		return $this->queryBuilder
-			->table($this->table())
-			->fields($fields)
+		return $this->table($this->getTable())
+			->fields(['*'])
 			->where(['id = ?'])
-			->update($values, [$id]);
-    }
+			->select([$id])[0];
+	}
+	
+	public function create(array $data)
+	{
+		return $this->save($data);
+	}
 
-    public function delete($id)
+    public function remove($id)
     {
-		return $this->queryBuilder
-			->table($this->table())
-			->fields($fields)
+		return $this->table($this->getTable())
 			->where(['id = ?'])
 			->delete([$id]);
 	}
 	
-	public function execute()
+	public function query(string $query)
 	{
-		return $this->queryBuilder->table($this->table());
+		$command = ucfirst(
+			strtolower( explode(' ', trim($query))[0] )
+		);
+		$command = 'execute' . $command;
+		
+		return $this->getConnection()
+			->$command($query, [], $this->getClassName());
 	}
 }
