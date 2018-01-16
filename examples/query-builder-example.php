@@ -1,29 +1,40 @@
 <?php
 
-require '../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 use PhpDao\Connection;
 use PhpDao\QueryBuilder;
 
 $options = [
     'host' => 'localhost',
-    'database' => 'your_database_name',
-    'user' => 'root',
+    'database' => 'ranking',
+    'user' => 'tiago',
     'password' => '',
     'port' => '3306',
     'driver' => 'mysql'
 ];
 
-//Instance the Connection class and pass the database options on constructor
-$connection = new Connection($options);
+$pdo = new PDO(
+    "mysql:host={$options['host']};port={$options['port']};dbname={$options['database']}",
+    $options['user'],
+    $options['password']
+);
+$pdo->setAttribute(
+    PDO::ATTR_ERRMODE,
+    PDO::ERRMODE_EXCEPTION
+);
+
+//Instance the Connection class and pass the PDO object on constructor
+$connection = new Connection($pdo);
+QueryBuilder::setConnection($connection);
 
 //Instance the QueryBuilder class and pass the connection class on constructor
-$queryBuilder = new QueryBuilder($connection);
+$queryBuilder = new QueryBuilder();
 
 // insert example 
 $insertedId = $queryBuilder->table('users')
-    ->fields(['email', 'password'])
-    ->insert(['email@test.com', crypt('password')]);
+    ->fields(['token', 'email', 'password'])
+    ->insert(['asdasd','email@test.com', 'password']);
 
 //select examples
 $tableValues = $queryBuilder->table('users')
