@@ -1,5 +1,5 @@
 # PHP-DAO
- Abstraction of the DAO pattern using PDO.
+ A simple library to handle Data Access Objects.
 
 ## Getting Started
 
