@@ -26,10 +26,13 @@ $pdo->setAttribute(
 
 //Instance the Connection class and pass the PDO object on constructor
 $connection = new Connection($pdo);
+
+//Sets the connection to QueryBuilder class
 QueryBuilder::setConnection($connection);
 
-//Instance the QueryBuilder class and pass the connection class on constructor
+//Instance the QueryBuilder class
 $queryBuilder = new QueryBuilder();
+
 
 // insert example 
 $insertedId = $queryBuilder->table('users')
@@ -42,7 +45,7 @@ $tableValues = $queryBuilder->table('users')
     ->select([]);
 
 $tableValues = $queryBuilder->table('users')
-    ->fields(['email'])
+    ->fields(['email', 'id', 'password'])
     ->where('email = ?')
     ->limit('1')
     ->select(['email@test.com']);
@@ -55,5 +58,5 @@ $queryBuilder->table('users')
 
 // delete example
 $tableValues = $queryBuilder->table('users')
-    ->where('id = ?')
+    ->where(['id = ?'])
     ->delete([$insertedId]);

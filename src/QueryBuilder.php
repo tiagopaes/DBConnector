@@ -2,7 +2,7 @@
 
 namespace PhpDao;
 
-use PhpDap\Connection;
+use PhpDao\Connection;
 
 /**
  * Class QueryBuilder
@@ -73,6 +73,20 @@ class QueryBuilder
     {
         return self::$connection;
     }
+
+    /**
+     * Returns the model class name.
+     * 
+     * @return string
+     */
+	protected function getClassName()
+	{
+        $className = get_class($this);
+        if ($className == self::class) {
+            $className = 'stdClass';
+        }
+        return $className;
+	}
 
     /**
      * Builds a select query and returns the
@@ -171,11 +185,13 @@ class QueryBuilder
      * Builds a update query and returns the
      * its result.
      * 
-     * @param array $values The values to build the query.
+     * @param array $values The values to be recorded.
+     * 
+     * @param array $filters The values to build the query.
      * 
      * @return array Returns the result of executed query.
      */
-    public function update(array $values)
+    public function update(array $values, array $filters = [])
     {
         $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
         $join = isset($this->clausules['join']) ? $this->clausules['join'] : '';

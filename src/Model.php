@@ -26,7 +26,7 @@ class Model extends QueryBuilder
 	private $properties = [];
 
 	/**
-     * The BaseModel constructor.
+     * The Model constructor.
      * 
 	 * @param array $data
      * 
@@ -74,16 +74,6 @@ class Model extends QueryBuilder
 	public function getTable()
 	{
 		return $this->table;
-	}
-
-	/**
-     * Returns the model class name.
-     * 
-     * @return string
-     */
-	protected function getClassName()
-	{
-        return get_class($this);
 	}
 
 	/**
