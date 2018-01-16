@@ -5,11 +5,11 @@ namespace PhpDao;
 use PhpDao\QueryBuilder;
 
 /**
- * Class BaseModel
+ * Class Model
  * 
  * @package PhpDao
  */
-class BaseModel extends QueryBuilder
+class Model extends QueryBuilder
 {
 	/**
      * The model table name.
