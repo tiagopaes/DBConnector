@@ -1,6 +1,6 @@
 {
     "name": "tiagopaes/php-dao",
-    "description": "Abstraction of the DAO pattern using PDO.",
+    "description": "A simple library to handle Data Access Objects.",
     "authors": [
         {
             "name": "Tiago Paes",
