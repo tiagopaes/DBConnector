@@ -2,31 +2,47 @@
 
 namespace PhpDao;
 
+use PhpDap\Connection;
+
 /**
- * Query Builder class.
+ * Class QueryBuilder
  * @package PhpDao
+ * @method QueryBuilder table (string $table)
+ * @method QueryBuilder join (string $join)
+ * @method QueryBuilder fields (array $fields)
+ * @method QueryBuilder where (array $where)
+ * @method QueryBuilder order (array $order)
+ * @method QueryBuilder group (array $group)
+ * @method QueryBuilder having (array $having)
+ * @method QueryBuilder limit (array $join)
  */
 class QueryBuilder
 {
     /**
-     * The PDO Object.
-     * @var PDO
+     * The database connection object.
+     * 
+     * @var Connection
      */
     protected static $connection;
 
+    /**
+     * The sql clausules to build the query.
+     * 
+     * @var array
+     */
     private $clausules = [];
 
-    public static function setConnection(Connection $connection)
-    {
-        self::$connection = $connection;
-    }
-
-    public function getConnection()
-    {
-        return self::$connection;
-    }
-    
-    function __call($name, $arguments)
+    /**
+     * Implements magic method to fill the
+     * $clausules property.
+     * 
+     * @param string $name
+     * 
+     * @param array $arguments
+     * 
+     * @return object $this
+     */
+    function __call(string $name, array $arguments)
     {
         $clausule = $arguments[0];
         if (count($arguments) > 1) {
@@ -36,7 +52,37 @@ class QueryBuilder
         return $this;
     }
 
-    public function select($values = [])
+    /**
+     * Sets the property $connection.
+     * 
+     * @param  Connection $connection
+     * 
+     * @return void
+     */
+    public static function setConnection(Connection $connection)
+    {
+        self::$connection = $connection;
+    }
+
+    /**
+     * Returns the property $connection.
+     * 
+     * @return Connection
+     */
+    public function getConnection()
+    {
+        return self::$connection;
+    }
+
+    /**
+     * Builds a select query and returns the
+     * its result.
+     * 
+     * @param array $values The values to build the query.
+     * 
+     * @return array Returns the result of executed query.
+     */
+    public function select(array $values = [])
     {
         $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
         
@@ -91,7 +137,15 @@ class QueryBuilder
         return $this->getConnection()->executeSelect($sql, $values, $this->getClassName());
     }
 
-    public function insert($values)
+    /**
+     * Builds a insert query and returns the
+     * its result.
+     * 
+     * @param array $values The values to build the query.
+     * 
+     * @return array Returns the result of executed query.
+     */
+    public function insert(array $values)
     {
         $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
         $_fields = isset($this->clausules['fields']) ? $this->clausules['fields'] : '<fields>';
@@ -113,7 +167,15 @@ class QueryBuilder
         return $this->getConnection()->executeInsert($sql, $values);
     }
 
-    public function update($values)
+    /**
+     * Builds a update query and returns the
+     * its result.
+     * 
+     * @param array $values The values to build the query.
+     * 
+     * @return array Returns the result of executed query.
+     */
+    public function update(array $values)
     {
         $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
         $join = isset($this->clausules['join']) ? $this->clausules['join'] : '';
@@ -158,7 +220,15 @@ class QueryBuilder
         return $this->getConnection()->executeUpdate($sql, array_merge($values, $filters));
     }
 
-    public function delete($filters)
+    /**
+     * Builds a delete query and returns the
+     * its result.
+     * 
+     * @param array $filters The values to build the query.
+     * 
+     * @return array Returns the result of executed query.
+     */
+    public function delete(array $filters)
     {
         $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
         $join = isset($this->clausules['join']) ? $this->clausules['join'] : '';
@@ -190,4 +260,22 @@ class QueryBuilder
         
         return $this->getConnection()->executeDelete($sql, $filters);
     }
+
+    /**
+     * Executes a sql query and returns the result.
+     * 
+     * @param string $query The sql query to be executed.
+     * 
+     * @return mixed Returns the result of executed query.
+     */
+    public function query(string $query)
+	{
+		$command = ucfirst(
+			strtolower( explode(' ', trim($query))[0] )
+		);
+		$command = 'execute' . $command;
+		
+		return $this->getConnection()
+			->$command($query, [], $this->getClassName());
+	}
 }

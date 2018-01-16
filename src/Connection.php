@@ -7,7 +7,7 @@ use PDOStatement;
 use Exception;
 
 /**
- * Database Connection class.
+ * Class Connection
  * @package PhpDao
  */
 class Connection

@@ -99,15 +99,4 @@ class Dao extends QueryBuilder
 			->where(['id = ?'])
 			->delete([$id]);
 	}
-	
-	public function query(string $query)
-	{
-		$command = ucfirst(
-			strtolower( explode(' ', trim($query))[0] )
-		);
-		$command = 'execute' . $command;
-		
-		return $this->getConnection()
-			->$command($query, [], $this->getClassName());
-	}
 }
