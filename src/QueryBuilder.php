@@ -4,7 +4,7 @@ namespace PhpDao;
 
 class QueryBuilder
 {
-    private $connection;
+    public static $connection;
 
     private $clausules = [];
     
@@ -18,31 +18,14 @@ class QueryBuilder
         return $this;
     }
 
-    public function __construct(Connection $connection)
+    public static function setConnection(Connection $connection)
     {
-        $this->connection = $connection;
+        self::$connection = $connection;
     }
 
-    public function insert($values)
+    public function getConnection()
     {
-        $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
-        $_fields = isset($this->clausules['fields']) ? $this->clausules['fields'] : '<fields>';
-        $fields = implode(', ', $_fields);
-        $_placeholders = array_map(function() {
-            return '?';
-        }, $_fields);
-        $placeholders = implode(', ', $_placeholders);
-        
-        $command = [];
-        $command[] = 'INSERT INTO';
-        $command[] = $table;
-        $command[] = '(' . $fields . ')';
-        $command[] = 'VALUES';
-        $command[] = '(' . $placeholders . ')';
-        
-        $sql = implode(' ', $command);
-        
-        return $this->connection->executeInsert($sql, $values);
+        return self::$connection;
     }
 
     public function select($values = [])
@@ -97,7 +80,29 @@ class QueryBuilder
         
         $sql = implode(' ', $command);
         
-        return $this->connection->executeSelect($sql, $values);
+        return $this->getConnection()->executeSelect($sql, $values);
+    }
+
+    public function insert($values)
+    {
+        $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
+        $_fields = isset($this->clausules['fields']) ? $this->clausules['fields'] : '<fields>';
+        $fields = implode(', ', $_fields);
+        $_placeholders = array_map(function() {
+            return '?';
+        }, $_fields);
+        $placeholders = implode(', ', $_placeholders);
+        
+        $command = [];
+        $command[] = 'INSERT INTO';
+        $command[] = $table;
+        $command[] = '(' . $fields . ')';
+        $command[] = 'VALUES';
+        $command[] = '(' . $placeholders . ')';
+        
+        $sql = implode(' ', $command);
+        
+        return $this->getConnection()->executeInsert($sql, $values);
     }
 
     public function update($values, $filters = [])
@@ -142,7 +147,7 @@ class QueryBuilder
      
         $sql = implode(' ', $command);
      
-        return $this->connection->executeUpdate($sql, array_merge($values, $filters));
+        return $this->getConnection()->executeUpdate($sql, array_merge($values, $filters));
     }
 
     public function delete($filters)
@@ -175,6 +180,6 @@ class QueryBuilder
         
         $sql = implode(' ', $command);
         
-        return $this->connection->executeDelete($sql, $filters);
+        return $this->getConnection()->executeDelete($sql, $filters);
     }
 }
