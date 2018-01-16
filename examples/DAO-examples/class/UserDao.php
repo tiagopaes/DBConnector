@@ -1,9 +1,8 @@
 <?php
 
-class UserDao extends BaseDao
+use PhpDao\Dao;
+
+class UserDao extends Dao
 {
-    public function table()
-    {
-      return 'users';
-    }
+    protected $table = 'users';
 }

@@ -2,52 +2,44 @@
 
 namespace PhpDao;
 
-abstract class Dao
+class Dao
 {
-    protected $queryBuilder;
+    protected static $connection;
 
     public function __construct()
+    {  
+	}
+	
+	public static function setConnection(Connection $connection)
     {
-		$options = [
-			'host' => $this->host(),
-			'port' => $this->port(),
-			'database' => $this->database(),
-			'user' => $this->user(),
-			'password' => $this->password(),
-			'driver' => $this->driver()
-		];
-
-		$this->queryBuilder = Factory::createQueryBuilder($options);  
+        self::$connection = $connection;
     }
 
-    abstract public function host();
-  
-    abstract public function database();
-
-    abstract public function port();
-  
-    abstract public function user();
-  
-    abstract public function password();
-  
-    abstract public function driver();
-
-    abstract public function table();
-
-    public function create(array $data)
+    public function getConnection()
     {
-		$fields = array_keys($data);
+        return self::$connection;
+    }
+
+	protected $table;
+	
+	public function getTable()
+	{
+		return $this->table;
+	}
+
+	public function create(array $data)
+	{
+		$fields = implode(array_keys($data), ',');
 		$values = [];
-		
-		foreach ($fields as $key => $item) {
-			$values[$key] = $data[$item];
+
+		foreach ($data as $key => $item) {
+			$values[$key] = '?';
 		}
-		
-		return $this->queryBuilder
-			->table($this->table())
-			->fields($fields)
-			->insert($values);
-    }
+		$values2 = implode($values, ',');
+
+		$query = "INSERT INTO {$this->table} ({$fields}) VALUES ({$values2})";
+		return $this->getConnection()->executeInsert($query, $values);
+	}
 
     public function get($id = null)
     {
