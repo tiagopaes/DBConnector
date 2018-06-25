@@ -96,5 +96,4 @@ class QueryBuilderTest extends TestCase
 
         $this->assertEquals(1, $result);
     }
-
 }

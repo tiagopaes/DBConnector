@@ -25,7 +25,9 @@ class TestCase extends PHPUnitTestCase
         $dotenv->load();
 
         $this->pdo = new PDO(
-            "{$_ENV['PHPDAO_DB_DRIVER']}:host={$_ENV['PHPDAO_DB_HOST']};port={$_ENV['PHPDAO_DB_PORT']};dbname={$_ENV['PHPDAO_DB_DATABASE']}",
+            "{$_ENV['PHPDAO_DB_DRIVER']}:host={$_ENV['PHPDAO_DB_HOST']};
+            port={$_ENV['PHPDAO_DB_PORT']};
+            dbname={$_ENV['PHPDAO_DB_DATABASE']}",
             "{$_ENV['PHPDAO_DB_USER']}",
             "{$_ENV['PHPDAO_DB_PASSWORD']}"
         );
