@@ -177,7 +177,7 @@ class QueryBuilder
         
         $sql = implode(' ', $command);
         
-        return $this->getConnection()->executeInsert($sql, $values);
+        return (int) $this->getConnection()->executeInsert($sql, $values);
     }
 
     /**
