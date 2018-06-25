@@ -30,7 +30,7 @@ class QueryBuilder
      *
      * @var array
      */
-    private $clausules = [];
+    protected $clausules = [];
 
     /**
      * Implements magic method to fill the
@@ -103,7 +103,7 @@ class QueryBuilder
         $_fields = isset($this->clausules['fields']) ? $this->clausules['fields'] : ['*'];
         $fields = implode(', ', $_fields);
         $join = isset($this->clausules['join']) ? $this->clausules['join'] : '';
-        
+
         $command = [];
         $command[] = 'SELECT';
         $command[] = $fields;
@@ -147,7 +147,6 @@ class QueryBuilder
         }
         
         $sql = implode(' ', $command);
-        
         return $this->getConnection()->executeSelect($sql, $values, $this->getClassName());
     }
 
@@ -178,7 +177,7 @@ class QueryBuilder
         
         $sql = implode(' ', $command);
         
-        return $this->getConnection()->executeInsert($sql, $values);
+        return (int) $this->getConnection()->executeInsert($sql, $values);
     }
 
     /**
