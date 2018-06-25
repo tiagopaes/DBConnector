@@ -23,7 +23,7 @@ class Model extends QueryBuilder
      *
      * @var string
      */
-    protected $primary_key = '';
+    protected $primary_key = 'id';
 
     /**
      * The model properties.
