@@ -7,8 +7,8 @@ use PhpDao\Model;
 
 $options = [
     'host' => 'localhost',
-    'database' => 'your-database-name',
-    'user' => 'username',
+    'database' => 'test',
+    'user' => 'root',
     'password' => '',
     'port' => '3306',
     'driver' => 'mysql'
@@ -33,6 +33,7 @@ Model::setConnection($connection);
 class User extends Model
 {
     protected $table = 'users';
+    protected $primary_key = 'id_user';
 }
 
 // Instance the User class model created
@@ -40,30 +41,22 @@ $user = new User();
 
 //Creates a new user on database
 $userCreated = $user->create([
-    'token' => 'token maroto',
-    'email' => 'live@live.com',
-    'password' => 'updated 2'
+    'name_user' => 'live@live.com'
 ]);
 
 //Creates a new user on database other way
-$user = new User();
-$user->token = 'token';
-$user->email = 'email';
-$user->password = 'password';
+$user->name_user = 'Guirerume';
 $user->save();
-
 // get all users recorded
 $users = $user->all();
 
 // get only one user
-$user = $user->find($id);
+$user = $user->find($users[0]->id_user);
 
 //update a model
 $user->save([
-    'token' => 'updated',
-    'email' => 'updated',
-    'password' => 'updated'
+    'name_user' => 'live@dasdasdasd.com'
 ]);
 
 // Delete a model
-$user->remove($id);
+$user->remove($users[0]->id_user);

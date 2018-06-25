@@ -19,6 +19,13 @@ class Model extends QueryBuilder
     protected $table = '';
 
     /**
+     * The table's primary key
+     *
+     * @var string
+     */
+    protected $primary_key = '';
+
+    /**
      * The model properties.
      *
      * @var array
@@ -121,8 +128,8 @@ class Model extends QueryBuilder
     public function find($id)
     {
         return $this->table($this->getTable())
-           ->where(['id = ?'])
-           ->select([$id])[0];
+            ->where([$this->primary_key . '= ?'])
+            ->select([$id])[0];
     }
 
     /**
@@ -136,26 +143,30 @@ class Model extends QueryBuilder
     {
         $this->fill($data);
 
-        if (isset($this->properties['id'])) {
+        if (isset($this->properties[$this->primary_key])) {
             $this->table($this->getTable())
                 ->fields($this->getFields())
-                ->where(['id = ?'])
-                ->update($this->properties, [$this->properties['id']]);
+                ->where([$this->primary_key . '= ?'])
+                ->update($this->properties, [$this->properties[$this->primary_key]]);
 
             return $this->table($this->getTable())
                 ->fields(['*'])
-                ->where(['id = ?'])
-                ->select([$this->properties['id']])[0];
+                ->where([$this->primary_key . '= ?'])
+                ->select([$this->properties[$this->primary_key]])[0];
         }
 
         $id = $this->table($this->getTable())
             ->fields($this->getFields())
             ->insert($this->properties);
-        
-        return $this->table($this->getTable())
+
+        $result =  $this->table($this->getTable())
             ->fields(['*'])
-            ->where(['id = ?'])
+            ->where([$this->primary_key . '= ?'])
             ->select([$id])[0];
+
+        $this->resetClausules();
+
+        return $result;
     }
 
     /**
@@ -179,8 +190,20 @@ class Model extends QueryBuilder
      */
     public function remove($id)
     {
-        return $this->table($this->getTable())
-            ->where(['id = ?'])
+        $result = $this->table($this->getTable())
+            ->where([$this->primary_key .  '= ?'])
             ->delete([$id]);
+
+        $this->resetClausules();
+        
+        return $result;
+    }
+
+    /**
+     * Reset the clausules to an empty array
+     */
+    private function resetClausules()
+    {
+        $this->clausules = [];
     }
 }

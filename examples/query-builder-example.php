@@ -7,8 +7,8 @@ use PhpDao\QueryBuilder;
 
 $options = [
     'host' => 'localhost',
-    'database' => 'your-database-name',
-    'user' => 'your-database-user-name',
+    'database' => 'test',
+    'user' => 'root',
     'password' => '',
     'port' => '3306',
     'driver' => 'mysql'
@@ -36,7 +36,7 @@ $queryBuilder = new QueryBuilder();
 
 // insert example 
 $insertedId = $queryBuilder->table('users')
-    ->fields(['token', 'email', 'password'])
+    ->fields(['user_name'])
     ->insert(['asdasd','email@test.com', 'password']);
 
 //select examples
