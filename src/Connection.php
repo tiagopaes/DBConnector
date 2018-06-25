@@ -20,9 +20,9 @@ class Connection
 
     /**
      * Connection constructor.
-     * 
+     *
      * @param PDO $pdo The PDO object
-     * 
+     *
      * @throws Exception
      */
     public function __construct(PDO $pdo)
@@ -32,7 +32,7 @@ class Connection
 
     /**
      * Retrieves the PDO object.
-     * 
+     *
      * @return PDO
      */
     public function connect()
@@ -42,32 +42,32 @@ class Connection
 
     /**
      * Returns a PDOStatement object.
-     * 
+     *
      * @param string $query A sql query
-     * 
+     *
      * @return PDOStatement
      */
-    public final function statement(string $query)
+    final public function statement(string $query)
     {
         return $this->connect()->prepare($query);
     }
 
     /**
      * Executes a sql select query.
-     * 
+     *
      * @param string $query A sql query
-     * 
+     *
      * @param array $values A array of values to execute
      * the query.
-     * 
+     *
      * @param string $className The name of that will be
      * returned with the recorded values.
-     * 
+     *
      * @return array Result of given sql query.
-     * 
+     *
      * @throws Exception
      */
-    public final function executeSelect(
+    final public function executeSelect(
         string $query,
         array $values,
         string $className = 'stdClass'
@@ -82,17 +82,17 @@ class Connection
 
     /**
      * Executes a sql insert query.
-     * 
+     *
      * @param string $query A sql query
-     * 
+     *
      * @param array $values A array of values to execute
      * the query.
-     * 
+     *
      * @return int Result of last inserted id if exists.
-     * 
+     *
      * @throws Exception
      */
-    public final function executeInsert(
+    final public function executeInsert(
         string $query,
         array $values
     ) {
@@ -103,17 +103,17 @@ class Connection
 
     /**
      * Executes a sql update query.
-     * 
+     *
      * @param string $query A sql query
-     * 
+     *
      * @param array $values A array of values to execute
      * the query.
-     * 
+     *
      * @return int Result of executed query.
-     * 
+     *
      * @throws Exception
      */
-    public final function executeUpdate(
+    final public function executeUpdate(
         string $query,
         array $values
     ) {
@@ -122,17 +122,17 @@ class Connection
 
     /**
      * Executes a sql delete query.
-     * 
+     *
      * @param string $query A sql query
-     * 
+     *
      * @param array $values A array of values to execute
      * the query.
-     * 
+     *
      * @return int Result of executed query.
-     * 
+     *
      * @throws Exception
      */
-    public final function executeDelete(
+    final public function executeDelete(
         string $query,
         array $values
     ) {
@@ -141,17 +141,17 @@ class Connection
 
     /**
      * Executes a sql query.
-     * 
+     *
      * @param string $query A sql query
-     * 
+     *
      * @param array $values A array of values to execute
      * the query.
-     * 
+     *
      * @return int Result of executed query.
-     * 
+     *
      * @throws Exception
      */
-    public final function execute($sql, array $values)
+    final public function execute($sql, array $values)
     {
         $statement = $this->statement($sql);
         $statement->execute(array_values($values));

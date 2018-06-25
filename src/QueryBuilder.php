@@ -20,14 +20,14 @@ class QueryBuilder
 {
     /**
      * The database connection object.
-     * 
+     *
      * @var Connection
      */
     protected static $connection;
 
     /**
      * The sql clausules to build the query.
-     * 
+     *
      * @var array
      */
     private $clausules = [];
@@ -35,14 +35,14 @@ class QueryBuilder
     /**
      * Implements magic method to fill the
      * $clausules property.
-     * 
+     *
      * @param string $name
-     * 
+     *
      * @param array $arguments
-     * 
+     *
      * @return object $this
      */
-    function __call(string $name, array $arguments)
+    public function __call(string $name, array $arguments)
     {
         $clausule = $arguments[0];
         if (count($arguments) > 1) {
@@ -54,9 +54,9 @@ class QueryBuilder
 
     /**
      * Sets the property $connection.
-     * 
+     *
      * @param  Connection $connection
-     * 
+     *
      * @return void
      */
     public static function setConnection(Connection $connection)
@@ -66,7 +66,7 @@ class QueryBuilder
 
     /**
      * Returns the property $connection.
-     * 
+     *
      * @return Connection
      */
     public function getConnection()
@@ -76,24 +76,24 @@ class QueryBuilder
 
     /**
      * Returns the model class name.
-     * 
+     *
      * @return string
      */
-	protected function getClassName()
-	{
+    protected function getClassName()
+    {
         $className = get_class($this);
         if ($className == self::class) {
             $className = 'stdClass';
         }
         return $className;
-	}
+    }
 
     /**
      * Builds a select query and returns the
      * its result.
-     * 
+     *
      * @param array $values The values to build the query.
-     * 
+     *
      * @return array Returns the result of executed query.
      */
     public function select(array $values = [])
@@ -136,7 +136,7 @@ class QueryBuilder
                 'separator' => ',',
             ],
         ];
-        foreach($clausules as $key => $clausule) {
+        foreach ($clausules as $key => $clausule) {
             if (isset($this->clausules[$key])) {
                 $value = $this->clausules[$key];
                 if (is_array($value)) {
@@ -154,9 +154,9 @@ class QueryBuilder
     /**
      * Builds a insert query and returns the
      * its result.
-     * 
+     *
      * @param array $values The values to build the query.
-     * 
+     *
      * @return array Returns the result of executed query.
      */
     public function insert(array $values)
@@ -164,7 +164,7 @@ class QueryBuilder
         $table = isset($this->clausules['table']) ? $this->clausules['table'] : '<table>';
         $_fields = isset($this->clausules['fields']) ? $this->clausules['fields'] : '<fields>';
         $fields = implode(', ', $_fields);
-        $_placeholders = array_map(function() {
+        $_placeholders = array_map(function () {
             return '?';
         }, $_fields);
         $placeholders = implode(', ', $_placeholders);
@@ -184,11 +184,11 @@ class QueryBuilder
     /**
      * Builds a update query and returns the
      * its result.
-     * 
+     *
      * @param array $values The values to be recorded.
-     * 
+     *
      * @param array $filters The values to build the query.
-     * 
+     *
      * @return array Returns the result of executed query.
      */
     public function update(array $values, array $filters = [])
@@ -200,7 +200,7 @@ class QueryBuilder
         $sets = $_fields;
      
         if (is_array($_fields)) {
-            $sets = implode(', ', array_map(function($value) {
+            $sets = implode(', ', array_map(function ($value) {
                 return $value . ' = ?';
             }, $_fields));
         }
@@ -221,7 +221,7 @@ class QueryBuilder
             ]
         ];
      
-        foreach($clausules as $key => $clausule) {
+        foreach ($clausules as $key => $clausule) {
             if (isset($this->clausules[$key])) {
                 $value = $this->clausules[$key];
                 if (is_array($value)) {
@@ -239,9 +239,9 @@ class QueryBuilder
     /**
      * Builds a delete query and returns the
      * its result.
-     * 
+     *
      * @param array $filters The values to build the query.
-     * 
+     *
      * @return array Returns the result of executed query.
      */
     public function delete(array $filters)
@@ -262,7 +262,7 @@ class QueryBuilder
             ]
         ];
         
-        foreach($clausules as $key => $clausule) {
+        foreach ($clausules as $key => $clausule) {
             if (isset($this->clausules[$key])) {
                 $value = $this->clausules[$key];
                 if (is_array($value)) {
@@ -279,19 +279,19 @@ class QueryBuilder
 
     /**
      * Executes a sql query and returns the result.
-     * 
+     *
      * @param string $query The sql query to be executed.
-     * 
+     *
      * @return mixed Returns the result of executed query.
      */
     public function query(string $query)
-	{
-		$command = ucfirst(
-			strtolower( explode(' ', trim($query))[0] )
-		);
-		$command = 'execute' . $command;
-		
-		return $this->getConnection()
-			->$command($query, [], $this->getClassName());
-	}
+    {
+        $command = ucfirst(
+            strtolower(explode(' ', trim($query))[0])
+        );
+        $command = 'execute' . $command;
+        
+        return $this->getConnection()
+            ->$command($query, [], $this->getClassName());
+    }
 }
