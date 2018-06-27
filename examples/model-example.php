@@ -33,7 +33,7 @@ Model::setConnection($connection);
 class User extends Model
 {
     protected $table = 'users';
-    protected $primary_key = 'id_user';
+    protected $primaryKey = 'id_user';
 }
 
 // Instance the User class model created

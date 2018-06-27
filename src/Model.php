@@ -23,7 +23,7 @@ class Model extends QueryBuilder
      *
      * @var string
      */
-    protected $primary_key = 'id';
+    protected $primaryKey = 'id';
 
     /**
      * The model properties.
@@ -128,7 +128,7 @@ class Model extends QueryBuilder
     public function find($id)
     {
         return $this->table($this->getTable())
-            ->where([$this->primary_key . '= ?'])
+            ->where([$this->primaryKey . '= ?'])
             ->select([$id])[0];
     }
 
@@ -143,16 +143,16 @@ class Model extends QueryBuilder
     {
         $this->fill($data);
 
-        if (isset($this->properties[$this->primary_key])) {
+        if (isset($this->properties[$this->primaryKey])) {
             $this->table($this->getTable())
                 ->fields($this->getFields())
-                ->where([$this->primary_key . '= ?'])
-                ->update($this->properties, [$this->properties[$this->primary_key]]);
+                ->where([$this->primaryKey . '= ?'])
+                ->update($this->properties, [$this->properties[$this->primaryKey]]);
 
             return $this->table($this->getTable())
                 ->fields(['*'])
-                ->where([$this->primary_key . '= ?'])
-                ->select([$this->properties[$this->primary_key]])[0];
+                ->where([$this->primaryKey . '= ?'])
+                ->select([$this->properties[$this->primaryKey]])[0];
         }
 
         $id = $this->table($this->getTable())
@@ -161,7 +161,7 @@ class Model extends QueryBuilder
 
         $result =  $this->table($this->getTable())
             ->fields(['*'])
-            ->where([$this->primary_key . '= ?'])
+            ->where([$this->primaryKey . '= ?'])
             ->select([$id])[0];
 
         $this->resetClausules();
@@ -191,7 +191,7 @@ class Model extends QueryBuilder
     public function remove($id)
     {
         $result = $this->table($this->getTable())
-            ->where([$this->primary_key .  '= ?'])
+            ->where([$this->primaryKey .  '= ?'])
             ->delete([$id]);
 
         $this->resetClausules();
