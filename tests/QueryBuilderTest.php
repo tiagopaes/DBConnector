@@ -8,6 +8,8 @@ use PhpDao\QueryBuilder;
 class QueryBuilderTest extends TestCase
 {
     private $queryBuilder = null;
+    
+    private $table = 'users';
 
     public function setUp()
     {
@@ -19,17 +21,16 @@ class QueryBuilderTest extends TestCase
         parent::setUp();
     }
 
-
     public function tearDown()
     {
-        $this->pdo->query("DELETE FROM users");
+        $this->pdo->query("DELETE FROM {$this->table}");
         parent::tearDown();
     }
 
     public function testShouldInsertData()
     {
-        $insertedId = $this->queryBuilder->table('users')
-            ->fields(['name_user'])
+        $insertedId = $this->queryBuilder->table($this->table)
+            ->fields(['name'])
             ->insert(['Reimu']);
 
         $this->assertTrue(is_int($insertedId));
@@ -37,11 +38,11 @@ class QueryBuilderTest extends TestCase
 
     public function testShouldSelectData()
     {
-        $this->queryBuilder->table('users')
-            ->fields(['name_user'])
+        $this->queryBuilder->table($this->table)
+            ->fields(['name'])
             ->insert(['Reimu']);
 
-        $result = $this->queryBuilder->table('users')
+        $result = $this->queryBuilder->table($this->table)
                 ->select();
 
         $this->assertNotEmpty($result);
@@ -51,12 +52,12 @@ class QueryBuilderTest extends TestCase
 
     public function testShouldSelectWhereData()
     {
-        $insertId = $this->queryBuilder->table('users')
-            ->fields(['name_user'])
+        $insertId = $this->queryBuilder->table($this->table)
+            ->fields(['name'])
             ->insert(['Reimu']);
 
-        $result = $this->queryBuilder->table('users')
-            ->where('id_user = ?')
+        $result = $this->queryBuilder->table($this->table)
+            ->where('id = ?')
             ->select([$insertId]);
 
         $this->assertNotEmpty($result);
@@ -66,34 +67,39 @@ class QueryBuilderTest extends TestCase
 
     public function testShouldUpdateData()
     {
-        $insertId = $this->queryBuilder->table('users')
-            ->fields(['name_user'])
+        $insertId = $this->queryBuilder->table($this->table)
+            ->fields(['name'])
             ->insert(['Reimu']);
 
-        $result = $this->queryBuilder->table('users')
-            ->fields(['name_user'])
-            ->where('id_user = ?')
+        $result = $this->queryBuilder->table($this->table)
+            ->fields(['name'])
+            ->where('id = ?')
             ->update(['Reisen'], [$insertId]);
 
-        $user = $this->queryBuilder->table('users')
-            ->where('id_user = ?')
-            ->field('name_user')
+        $user = $this->queryBuilder->table($this->table)
+            ->where('id = ?')
+            ->field('name')
             ->select([$insertId]);
 
         $this->assertEquals(1, $result);
-        $this->assertEquals('Reisen', $user[0]->name_user);
+        $this->assertEquals('Reisen', $user[0]->name);
     }
 
     public function testShouldDeleteData()
     {
-        $insertId = $this->queryBuilder->table('users')
-            ->fields(['name_user'])
+        $insertId = $this->queryBuilder->table($this->table)
+            ->fields(['name'])
             ->insert(['Reimu']);
 
-        $result = $this->queryBuilder->table('users')
-            ->where(['id_user = ?'])
+        $result = $this->queryBuilder->table($this->table)
+            ->where(['id = ?'])
             ->delete([$insertId]);
 
+        $user = $this->queryBuilder->table($this->table)
+            ->where('id = ?')
+            ->select([$insertId]);
+        
         $this->assertEquals(1, $result);
+        $this->assertEmpty($user);
     }
 }

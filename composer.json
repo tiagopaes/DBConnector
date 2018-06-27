@@ -22,6 +22,7 @@
     "require-dev": {
         "php": ">=5.4",
         "phpunit/phpunit": "^7.2",
-        "vlucas/phpdotenv": "^2.4"
+        "vlucas/phpdotenv": "^2.4",
+        "robmorgan/phinx": "^0.10.3"
     }
 }

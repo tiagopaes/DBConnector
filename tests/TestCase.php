@@ -38,6 +38,7 @@ class TestCase extends PHPUnitTestCase
         );
 
         $this->connection = new Connection($this->pdo);
+        
         parent::__construct();
     }
 }
