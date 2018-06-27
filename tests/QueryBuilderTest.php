@@ -102,4 +102,37 @@ class QueryBuilderTest extends TestCase
         $this->assertEquals(1, $result);
         $this->assertEmpty($user);
     }
+
+    public function testShouldToDoCrudOperationsByQueryMethod()
+    {
+        //test insert
+        $insertedId = $this->queryBuilder->query(
+            "INSERT INTO {$this->table} SET name = 'test'"
+        );
+        $this->assertTrue(is_numeric($insertedId));
+
+        //test select
+        $users = $this->queryBuilder->query(
+            "SELECT * FROM {$this->table}"
+        );
+        $this->assertNotEmpty($users);
+
+        //test update
+        $this->queryBuilder->query(
+            "UPDATE {$this->table} SET name = 'updated' WHERE id = {$users[0]->id}"
+        );
+        $users = $this->queryBuilder->query(
+            "SELECT * FROM {$this->table}"
+        );
+        $this->assertEquals('updated', $users[0]->name);
+
+        //test delete
+        $this->queryBuilder->query(
+            "DELETE FROM {$this->table}"
+        );
+        $users = $this->queryBuilder->query(
+            "SELECT * FROM {$this->table}"
+        );
+        $this->assertEmpty($users);
+    }
 }
