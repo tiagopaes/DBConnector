@@ -127,9 +127,15 @@ class Model extends QueryBuilder
      */
     public function find($id)
     {
-        return $this->table($this->getTable())
-            ->where([$this->primaryKey . '= ?'])
-            ->select([$id])[0];
+        $result = $this->table($this->getTable())
+            ->where([$this->primaryKey . ' = ?'])
+            ->select([$id]);
+        if (empty($result)) {
+            $result = null;
+        }
+        $this->resetClausules();
+        
+        return $result[0];
     }
 
     /**
@@ -146,12 +152,12 @@ class Model extends QueryBuilder
         if (isset($this->properties[$this->primaryKey])) {
             $this->table($this->getTable())
                 ->fields($this->getFields())
-                ->where([$this->primaryKey . '= ?'])
+                ->where([$this->primaryKey . ' = ?'])
                 ->update($this->properties, [$this->properties[$this->primaryKey]]);
 
             return $this->table($this->getTable())
                 ->fields(['*'])
-                ->where([$this->primaryKey . '= ?'])
+                ->where([$this->primaryKey . ' = ?'])
                 ->select([$this->properties[$this->primaryKey]])[0];
         }
 
@@ -159,9 +165,9 @@ class Model extends QueryBuilder
             ->fields($this->getFields())
             ->insert($this->properties);
 
-        $result =  $this->table($this->getTable())
+        $result = $this->table($this->getTable())
             ->fields(['*'])
-            ->where([$this->primaryKey . '= ?'])
+            ->where([$this->primaryKey . ' = ?'])
             ->select([$id])[0];
 
         $this->resetClausules();
